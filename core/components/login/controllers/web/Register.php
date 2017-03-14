@@ -348,27 +348,29 @@ class LoginRegisterController extends LoginController {
         if (strlen($passwordWordSeparator) == 0) $passwordWordSeparator = ' ';
         $wordCount = $this->getWordsInString($password,$passwordWordSeparator);
         $minimumStrongPasswordWordCount = $this->getProperty('minimumStrongPasswordWordCount',4,'!empty');
-        if ($wordCount < $minimumStrongPasswordWordCount || $minimumStrongPasswordWordCount == 0) {
-            $passwordStrengthThreshold = $this->getProperty('maximumPossibleStrongerPasswords',25,'!empty');
-            if ($passwordStrengthThreshold > 0) {
-                $possible = $this->getPossibleStrongerPasswords($password);
+        if ($password) {
+          if ($wordCount < $minimumStrongPasswordWordCount || $minimumStrongPasswordWordCount == 0) {
+              $passwordStrengthThreshold = $this->getProperty('maximumPossibleStrongerPasswords',25,'!empty');
+              if ($passwordStrengthThreshold > 0) {
+                  $possible = $this->getPossibleStrongerPasswords($password);
 
-                if (count($possible) > $passwordStrengthThreshold) {
-                    $ensurePasswordStrengthSuggestions = $this->getProperty('ensurePasswordStrengthSuggestions',5,'!empty');
-                    $suggestionIndexes = array_rand($possible,$ensurePasswordStrengthSuggestions);
-                    $suggestions = array();
-                    foreach ($suggestionIndexes as $idx) {
-                        $suggestions[] = $possible[$idx];
-                    }
-                    $this->validator->addError($passwordField,$this->modx->lexicon('register.use_stronger_password',array(
-                        'suggestions' => implode(', ',$suggestions),
-                    )));
-                }
-            } else {
-                $ensured = true;
-            }
-        } else {
-            $ensured = true;
+                  if (count($possible) > $passwordStrengthThreshold) {
+                      $ensurePasswordStrengthSuggestions = $this->getProperty('ensurePasswordStrengthSuggestions',5,'!empty');
+                      $suggestionIndexes = array_rand($possible,$ensurePasswordStrengthSuggestions);
+                      $suggestions = array();
+                      foreach ($suggestionIndexes as $idx) {
+                          $suggestions[] = $possible[$idx];
+                      }
+                      $this->validator->addError($passwordField,$this->modx->lexicon('register.use_stronger_password',array(
+                          'suggestions' => implode(', ',$suggestions),
+                      )));
+                  }
+              } else {
+                  $ensured = true;
+              }
+          } else {
+              $ensured = true;
+          }
         }
 
         return $ensured;
